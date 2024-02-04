@@ -1,0 +1,133 @@
+## 지하철 시간대별 데이터 시각화하기 ##
+import csv
+f = open('subwaytime.csv')
+data = csv.reader(f)
+
+for row in data:
+    print(row)
+-------------------------
+#출근 시간대 사람들이 가장 많이 타고 내리는 역 찾아보기
+
+import csv
+f = open('subwaytime.csv')
+data = csv.reader(f)
+
+next(data)
+next(data)
+result = []
+
+for row in data:
+    for i in range(4, 52):      
+      # row[4:] = map(int, row[4:]) : 오류 나는 이유가 뭐지..? --> ValueError: invalid literal for int() with base 10: '' --> 왜..?
+        row[i] = int(row[i])
+    result.append(sum(row[10:15:2]))
+    
+# print(len(result))
+# print(result)
+
+import matplotlib.pyplot as plt
+result.sort()
+plt.bar(range(len(result)), result)
+plt.show()
+-----------------------
+## 출근시간대 --> 7~9시까지 승ㅇ차 인원을 합침
+import csv
+f = open('subwaytime.csv')
+data = csv.reader(f)
+
+next(data)
+next(data)
+
+mx = 0
+mx_station = ''
+
+for row in data:
+    for i in range(4, 52):
+        row[i] = int(row[i])
+    a = row[11:16:2]
+    if sum(a) > mx:
+        mx = sum(a)
+        mx_station = row[3] + '(' + row[1] + ')'
+        
+print(mx_station, mx)
+----------------------
+## 밤 11시에 사람들이 가장 많이 타는 역?  --> 원하는 시간대 입력 시 그 시간대에 해당하는 승차 인원 출력
+
+import csv
+f = open('subwaytime.csv')
+data = csv.reader(f)
+
+next(data)
+next(data)
+
+mx = 0
+mx_station = ''
+t = int(input('몇 시의 승차 인원이 가장 많은 역이 궁금하십니까?  : '))
+
+for row in data:
+    for i in range(4, 52):
+        row[i] = int(row[i])
+    a = row[4+(t-4)*2]
+    if a > mx:
+        mx = a
+        mx_station = row[3] + '(' + row[1] + ')'
+        
+print(mx_station, mx)
+-------------------
+## 시간대별로 사람들이 가장 많이 타고 내리는 역?
+import csv
+f = open('subwaytime.csv')
+data = csv.reader(f)
+
+next(data)
+next(data)
+
+mx = [0] * 24
+mx_station = [''] * 24
+
+for row in data:
+    for i in range(4, 52):
+        row[i] = int(row[i])
+    for j in range(24):
+        a = row[4 + j*2]
+        if a > mx[j]:
+            mx[j] = a
+            mx_station[j] = row[3] + '(' + str(j+4) + '시)'
+        
+# print(mx_station)
+# print(mx)
+
+import matplotlib.pyplot as plt
+
+plt.rc('font', family = 'Malgun Gothic')
+plt.bar(range(24), mx)
+plt.xticks(range(24), mx_station, rotation = 90)
+plt.show()
+-------------------------------
+## 모든 지하철역에서 시간대별 승하차 인원 모두 더하면 --> 지하철 시간대별 승하차 인원 추이 알아보기
+
+import csv
+import matplotlib.pyplot as plt
+f = open('subwaytime.csv')
+data = csv.reader(f)
+
+next(data)
+next(data)
+
+s_in = [0] *24
+s_out = [0] *24
+
+for row in data:
+    for i in range(4, 52):
+        row[i] = int(row[i])
+    for j in range(24):
+        s_in[j] += row[4 + j*2]
+        s_out[j] += row[5 + j*2]
+
+plt.rc('font', family = 'Malgun Gothic')
+plt.title('지하철 시간대별 승하차 인원 추이')
+plt.plot(s_in, label = '승차')
+plt.plot(s_out, label = '하차')
+plt.legend()
+plt.xticks(range(24), range(4,28))
+plt.show()
