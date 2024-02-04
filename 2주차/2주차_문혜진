@@ -1,0 +1,171 @@
+## 인구 통계 데이터 파악 ##
+
+import csv
+f = open('202312_202312_연령별인구현황_연간.csv')
+data = csv.reader(f)
+result = []
+
+# # if '서울특별시 노원구 월계1동(1135056000)' == row[0] :
+# #     print(row)
+
+# # for row in data : 
+# #     print(row)
+
+# # 노원구 월계 1동의 경우
+# for row in data :
+#     if '월계1동' in row[0] :
+# #            print(len(row[3:])) 전체 데이터 개수 결과 맞는지 확인, 101개 나와야함
+#         for i in row[3:] :
+# #           result.append(i)    <-- 문자열로 저장, 분석을 위해 정수로 바꿔줘야 함
+#             result.append(int(i)) # 문자열을 정수열로 바꾸기
+            
+# print(result)
+
+# ## 그래프 그려보기
+# import matplotlib.pyplot as plt
+# plt.style.use('ggplot')
+# plt.plot(result)
+# plt.show()
+
+
+### 원하는 동(지역)의 그래프 출력 ###
+name = input('인구 구조가 알고 싶은 노원구 지역의 이름(읍면동 단위)을 입력해 주세요 : ')
+
+for row in data :
+    if name in row[0]:
+        for i in row[3:] :
+            result.append(int(i.replace(',',''))) #csv 파일내 ,를 모두 빈 문자로 바꿔 줌
+
+import matplotlib.pyplot as plt
+plt.style.use('ggplot')
+plt.rc('font', family = 'Malgun Gothic')
+plt.title(name + '지역의 인구 구조')
+plt.plot(result)
+plt.show()            
+            
+-------------------------------------
+# 동네(노원구) 인구 구조 막대 그래프 표시
+
+import csv
+f = open('202312_202312_연령별인구현황_연간.csv')
+data = csv.reader(f)
+result = []
+
+for row in data :
+    if '월계1동' in row[0] :
+        for i in row[3:] :
+            result.append(int(i)) 
+            
+# 막대그래프 - 수직 방향
+import matplotlib.pyplot as plt
+# plt.bar(range(101),result)
+# plt.show()
+
+# 막대그래프 - 수평 방향
+plt.barh(range(101),result)
+plt.show()
+
+---------------------------
+# 노원구 연령별 성비 알아보기 - 월계 1동
+import csv
+f = open('노원구 성별.csv')
+data = csv.reader(f)
+
+m = []
+fe = []
+
+## 방법1 ##
+# for row in data :
+#     if '월계1동' in row[0]:
+#         for i in range(0,101) :
+#             m.append(int(row[i+3]))
+#             fe.append(int(row[-(i+1)]))
+
+# f.reverse() #reverse() : 리스트의 값으 역순으로 재배열하는 함수
+
+## 방법2 ##
+for row in data :
+    if '월계1동' in row[0]:
+        for i in row[3:104] :
+            m.append(-int(i))
+        for i in row[106:]:
+            fe.append(int(i))
+
+
+#그래프그리기
+import matplotlib.pyplot as plt
+plt.rc('font', family = 'Malgun Gothic')
+plt.rcParams['axes.unicode_minus'] = False # - 부호 표시
+
+plt.title('노원구 월계1동 남녀 성별 인구 분포')
+plt.barh(range(101),m,label = '남성')
+plt.barh(range(101),fe, label = '여성')
+plt.legend()
+plt.show()
+------------------------------
+## 노원구 내 원하는 동 남녀 성별 인구 분포 
+
+import csv
+f = open('노원구 성별.csv')
+data = csv.reader(f)
+
+m = []
+fe = []
+
+name = input('인구 구조가 알고 싶은 노원구 지역의 이름(읍면동 단위)을 입력해 주세요 : ')
+for row in data :
+    if name in row[0]:
+        for i in row[3:104] :
+            m.append(-int(i))
+        for i in row[106:]:
+            fe.append(int(i))
+
+
+#그래프그리기
+import matplotlib.pyplot as plt
+plt.style.use('ggplot')
+plt.figure(figsize=(10,5), dpi=300)
+plt.rc('font', family = 'Malgun Gothic')
+plt.rcParams['axes.unicode_minus'] = False # - 부호 표시
+
+plt.title('노원구 ' + name + ' 남녀 성별 인구 분포')
+plt.barh(range(101),m,label = '남성')
+plt.barh(range(101),fe, label = '여성')
+plt.legend()
+plt.show()
+----------------------------
+# 노원구 인구 파이 차트로 나타내기 - pie()
+
+import csv
+f = open('노원구 성별.csv')
+data = csv.reader(f)
+
+m = []
+fe = []
+size = []
+
+name = input('인구 구조가 알고 싶은 노원구 지역의 이름(읍면동 단위)을 입력해 주세요 : ')
+for row in data :
+    if name in row[0]:
+        m = 0
+        fe = 0
+        for i in range(101) :
+            m += int(row[i+3]) # 3~ 103 까지 더함
+            fe += int(row[(i+106)]) # 106에서 206까지 더함
+        break
+
+size.append(m)
+size.append(fe)
+
+#print(size)
+
+#그래프그리기
+import matplotlib.pyplot as plt
+plt.rc('font', family = 'Malgun Gothic')
+color = ['orange', 'green']
+plt.axis('equal')
+plt.pie(size, labels = ['남', '여'], autopct='%.1f%%', colors = color, startangle = 90)
+
+plt.title('노원구 ' + name + ' 지역 남녀 성별 비율')
+plt.show()
+-----------------------------
